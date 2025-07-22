@@ -5,4 +5,5 @@ As such, requires packages of either:
 [1]: matplotlib, seaborn,scikit-learn,pandas,numpy
 [2]: pyspark,pandas,numpy
 
-
+Prints Correlation Matrix of Input
+Prints Feature Importance of Model
