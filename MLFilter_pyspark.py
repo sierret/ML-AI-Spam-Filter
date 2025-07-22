@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from pyspark import sql
 from pyspark.sql import SparkSession,types
 from pyspark.ml.feature import VectorAssembler
-import seaborn as sns
+from pyspark.ml.stat import Correlation
 
 tuneHyperPar=False #if to tune the hyperparameters of the classifiers
 
@@ -24,20 +24,21 @@ def viewDataStats(data):
         nan_values = data.isna().sum()
         for i in range(len(data.columns)):
             print(columns[i], types[i], unique[i], nan_values[i])
-        
+    elif(isinstance(data, pyspark.sql.DataFrame)):
+        data.schema
     else:
         print("Not a Dataframe" + str(type(data)))
         exit(0)
 
-def showImportantFeatures(model,cols): #for tree-based models
-    importances = model.feature_importances_
-    sns.barplot(x=importances, y=cols[:-1])
-    plt.show()
-def showCorMatrix(spamData):
-    spamData=spamData.iloc[:, : -1]
-    correlation_matrix = spamData.corr()
-    sns.heatmap(correlation_matrix, cmap='coolwarm', annot=False)
-    plt.show()
+##def showImportantFeatures(model,cols): #for tree-based models
+##    importances = model.feature_importances_
+##    sns.barplot(x=importances, y=cols[:-1])
+##    plt.show()
+def showCorMatrix(df_vec):
+    correlation_matrix = Correlation.corr(df_vec, "features", method="pearson").head()[0]
+
+    print("Correlation Matrix:\n", correlation_matrix.toArray())
+
 
 if __name__=="__main__":
     spambase_data = pd.read_csv('spambase.csv', header=None)
@@ -47,7 +48,7 @@ if __name__=="__main__":
     data = spambase_data.drop(index=0) #remove row of columns names
     data.reset_index(drop=True, inplace=True)
     
-    showCorMatrix(data)
+    
     data = data.rename(columns={'Spam': 'label'})
     spark = SparkSession.builder.appName('example').getOrCreate()
     data=spark.createDataFrame(data)
@@ -66,6 +67,8 @@ if __name__=="__main__":
     #clf = NaiveBayes(smoothing=1.0, modelType="multinomial")
     clf = RandomForestRegressor(labelCol="label", featuresCol="features")    
     pipeline=Pipeline(stages=[assembler,clf])
+    n_data=pipeline.transform(data)
+    showCorMatrix(n_data)
     #clf = MultinomialNB() #Bayes
     if (not tuneHyperPar):
         cv_model = pipeline.fit(train_data)
