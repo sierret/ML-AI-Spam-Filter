@@ -67,7 +67,7 @@ if __name__=="__main__":
     #clf = NaiveBayes(smoothing=1.0, modelType="multinomial")
     clf = RandomForestClassifier(labelCol="label", featuresCol="features")    
     pipeline=Pipeline(stages=[assembler,clf])
-    n_data=pipeline.transform(data)
+    n_data=assembler.transform(data)
     showCorMatrix(n_data)
     #clf = MultinomialNB() #Bayes
     if (not tuneHyperPar):
