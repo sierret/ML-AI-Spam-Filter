@@ -65,7 +65,7 @@ if __name__=="__main__":
     cv_model=None
     assembler = VectorAssembler(inputCols=feature_list, outputCol="features")
     #clf = NaiveBayes(smoothing=1.0, modelType="multinomial")
-    clf = RandomForestRegressor(labelCol="label", featuresCol="features")    
+    clf = RandomForestClassifier(labelCol="label", featuresCol="features")    
     pipeline=Pipeline(stages=[assembler,clf])
     n_data=pipeline.transform(data)
     showCorMatrix(n_data)
