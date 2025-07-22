@@ -7,6 +7,6 @@ As such, requires packages of either:
 
 Prints Accuracy;
 
-Prints Correlation Matrix of Input;
+(curently)scikit-learn only)Prints Correlation Matrix of Input;
 
 Prints Feature Importance of Model;
