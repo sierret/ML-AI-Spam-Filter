@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from pyspark import sql
 from pyspark.sql import SparkSession,types
 from pyspark.ml.feature import VectorAssembler
+import seaborn as sns
 
 tuneHyperPar=False #if to tune the hyperparameters of the classifiers
 
@@ -62,8 +63,8 @@ if __name__=="__main__":
     train_data, test_data = data.randomSplit([0.7, 0.3], seed=42)
     cv_model=None
     assembler = VectorAssembler(inputCols=feature_list, outputCol="features")
-    clf = NaiveBayes(smoothing=1.0, modelType="multinomial")
-    #clf = RandomForestRegressor(labelCol="label", featuresCol="features")    
+    #clf = NaiveBayes(smoothing=1.0, modelType="multinomial")
+    clf = RandomForestRegressor(labelCol="label", featuresCol="features")    
     pipeline=Pipeline(stages=[assembler,clf])
     #clf = MultinomialNB() #Bayes
     if (not tuneHyperPar):
