@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -27,6 +29,8 @@ def viewDataStats(data):
         exit(0)
 
 def showImportantFeatures(model,cols): #for tree-based models
+    if (not hasattr(model,'feature_importances_')):
+        return
     importances = model.feature_importances_
     sns.barplot(x=importances, y=cols[:-1])
     plt.show()
@@ -35,6 +39,13 @@ def showCorMatrix(spamData):
     correlation_matrix = spamData.corr()
     sns.heatmap(correlation_matrix, cmap='coolwarm', annot=False)
     plt.show()
+
+try:
+    # Import for Python pre 3.6
+    from idlelib.PyShell import main
+except ModuleNotFoundError:
+    # Import for Python version 3.6 and later
+    from idlelib.pyshell import main
 
 if __name__=="__main__":
     spambase_data = pd.read_csv('spambase.csv', header=None)
@@ -60,6 +71,7 @@ if __name__=="__main__":
     if (not tuneHyperPar):
         #clf = MultinomialNB() #Bayes
         clf = RandomForestClassifier(random_state=42) #Random Forest
+        #clf = SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42)
         clf.fit(X_train, y_train)
         showImportantFeatures(clf,spambase_data.columns)
     else:
@@ -68,7 +80,9 @@ if __name__=="__main__":
         param_grid = {'n_estimators': [50, 100, 200], 'max_depth': [None, 10, 20]}
         clf = GridSearchCV(RandomForestClassifier(random_state=42), param_grid, cv=5)
         clf.fit(X_train, y_train)
-         
+
+##    pred=clf.predict(X_test)
+##    print(pred)
     print("Accuracy:"+(str)(clf.score(X_test, y_test)))
     
 
